@@ -2,7 +2,7 @@
 ![Super lint](https://github.com/Okuyama-Lab/repository-template/actions/workflows/super-linter.yml/badge.svg)
 ![Issue Auto Assign](https://github.com/Okuyama-Lab/repository-template/actions/workflows/issue_assignment.yml/badge.svg)
 
-# リポジトリの名前：template
+# リポジトリの名前：TK2_simulator
 ## ディレクトリ構成
 | 親ディレクトリ | 子ディレクトリ | 孫ディレクトリ |
 |:---:|:---:|:---:|
