@@ -1,0 +1,19 @@
+# レビュワーの自動アサイン
+name: auto-assign
+on:
+  pull_request:
+    # どんなときに実行するか
+    types: [opened, ready_for_review, reopened]
+jobs:
+  add-reviews:
+    runs-on: ubuntu-latest
+    # Actionsが必要とするpermissions
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      # Node.js関連のエラーが出た。バージョン上げた。
+      - uses: kentaro-m/auto-assign-action@v1.2.5
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: ".github/auto_assign.yml" # 呼び出し
