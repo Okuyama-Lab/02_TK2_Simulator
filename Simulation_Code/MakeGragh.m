@@ -50,7 +50,7 @@ function [] = MakeGragh(data)
    legend({'ω_x','ω_y','ω_z'},'Location','southeast')
    % 軸のフォントサイズを設定
    set(gca, 'FontSize', 15);
-   saveas(gcf,fullfile(outdir,'InertialBodyAngulaRates.png '));
+   saveas(gcf,fullfile(outdir,'InertialBodyAngulaRates.png'));
    saveas(gcf,fullfile(outdir,'InertialBodyAngulaRates.fig'));
 
    fprintf("Next Angular Moment is [ x=%f y=%f z=%f ]\n",data(n,36),data(n,37),data(n,38));
