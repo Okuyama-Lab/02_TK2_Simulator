@@ -7,6 +7,7 @@
 
 function [] = Caluc_PowerConsumption_ADCS(data)
 
+    time = data(:,3);
     %% === MTQ Parameters ===
     Current_max = [245.8, 293.5, 290.2]; % [mA]
     Volt_MTQ = 5.0;                      % [V]
@@ -49,10 +50,10 @@ function [] = Caluc_PowerConsumption_ADCS(data)
     end
 
     %% === テーブル作成と保存 ===
-    T = table(MTQ_x, MTQ_y, MTQ_z, MTQ_sum, ...
+    T = table(time, MTQ_x, MTQ_y, MTQ_z, MTQ_sum, ...
               RW_x, RW_y, RW_z, RW_sum, ...
               ADCS_total, ...
-              'VariableNames', {'MTQ_x_W', 'MTQ_y_W', 'MTQ_z_W', 'MTQ_sum_W', ...
+              'VariableNames', {'Time[s]', 'MTQ_x_W', 'MTQ_y_W', 'MTQ_z_W', 'MTQ_sum_W', ...
                                 'RW_x_W', 'RW_y_W', 'RW_z_W', 'RW_sum_W', ...
                                 'ADCS_total_W'});
 
@@ -60,4 +61,28 @@ function [] = Caluc_PowerConsumption_ADCS(data)
 
     disp(['Power consumption log saved as: ', filename]);
 
+    plot(MTQ_sum)
+    grid on
+    xlabel("Time [s]")
+    ylabel("PowerConsumption [W]")
+    hAxes = findobj(gcf,"Type","axes");
+    hAxes.FontSize = 15;
+    hAxes.LineWidth = 1;
+    hLine = findobj(gcf,"Type","line");
+    hLine.LineWidth = 2;
+    saveas(gcf, fullfile(outdir, 'MTQ_PowerConsumption.png'));
+    saveas(gcf,fullfile(outdir,'MTQ_PowerConsumption.fig'));
+    figure
+
+    plot(RW_sum)
+    grid on
+    xlabel("Time [s]")
+    ylabel("PowerConsumption [W]")
+    hAxes = findobj(gcf,"Type","axes");
+    hAxes.FontSize = 15;
+    hAxes.LineWidth = 1;
+    hLine = findobj(gcf,"Type","line");
+    hLine.LineWidth = 2;
+    saveas(gcf, fullfile(outdir, 'RW_PowerConsumption.png'));
+    saveas(gcf,fullfile(outdir,'RW_PowerConsumption.fig'));
 end

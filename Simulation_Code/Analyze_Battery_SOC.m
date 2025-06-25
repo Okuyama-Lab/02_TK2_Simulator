@@ -66,13 +66,12 @@ function Analyze_Battery_SOC(DT)
     end
 
     %% === バッテリー更新ループ ===
-    nominal_power = 2.3614;
     for i = 2:length(time)
         state = mission_state_array(i);
         if isKey(mode_map, state)
             P_consumption = mode_map(state);
         else
-            P_consumption = nominal_power;
+            P_consumption = mode_map(1); %ノミナル消費電力
         end
         P_ADCS = adcs_power(i);
         total_power = P_consumption + P_ADCS;
@@ -110,7 +109,7 @@ function Analyze_Battery_SOC(DT)
     xregion([eclips_start], [eclips_end])
     hold on;
     yline(Max_capacity_mAh, '--k', sprintf('Max: %.0fmAh', Max_capacity_mAh));
-    yline(Max_capacity_mAh * 0.7, '-.r', 'DOD: 70%');
+    yline(Max_capacity_mAh * 0.85, '-.r', 'DOD: 85%');
     ylim([0 10000]); 
     xlabel('Time [s]');
     ylabel('Battery Capacity [mAh]');
