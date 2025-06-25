@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Last update ：2024/01/29
+% Last update ：2025/6/25
 % Name : Keigo Mutsuo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -7,6 +7,18 @@
 outdir = 'output';
 if ~exist(outdir, 'dir')
     mkdir(outdir);
+end
+
+
+% 既存ファイルの削除（tle と xlsx）
+existingTLE = fullfile(outdir, 'generated.tle');
+existingXLSX = fullfile(outdir, 'Result_Orbit.xlsx');
+
+if exist(existingTLE, 'file')
+    delete(existingTLE);
+end
+if exist(existingXLSX, 'file')
+    delete(existingXLSX);
 end
 
 % ==== 軌道要素の設定 ====
@@ -18,12 +30,12 @@ argPeriapsis = 0;            % 近地点引数 [deg]
 trueAnomaly = 0;             % 真近点角 [deg]
 
 % ==== JSTのシナリオ開始時刻 ====
-startTimeJST = datetime(2026,1,1,0,0,0,'TimeZone','Asia/Tokyo');
-stopTime = startTimeJST + days(31);
-sampleTime = 10;  % [s]
+startTimeJST = datetime(2025,6,25,0,0,0,'TimeZone','Asia/Tokyo');
+stopTime = startTimeJST + days(2);
+sampleTime = 1;  % [s]
 
 % ==== TLE生成 ====
-tleText = generateTLEfromElements(sma, ecc, inc, RAAN, argPeriapsis, trueAnomaly);
+tleText = generateTLEfromElements(sma, ecc, inc, RAAN, argPeriapsis, trueAnomaly, startTimeJST);
 tleFile = fullfile(outdir, 'generated.tle');
 fid = fopen(tleFile, 'w');
 fprintf(fid, '%s\n', tleText);
@@ -41,7 +53,7 @@ gs = groundStation(sc, ...
     'Longitude', 140.05691485473042, ...
     'Altitude', 0, ...
     'Name', 'Nihon University', ...
-    'MinElevationAngle', 15);
+    'MinElevationAngle', 0);
 
 % ==== アクセス解析 ====
 ac = access(gs, sat);
@@ -50,6 +62,11 @@ ac = access(gs, sat);
 visTimes = accessIntervals(ac);
 
 % ==== JSTのまま秒換算 ====
+startTimeJSTs = visTimes.StartTime;
+endTimeJSTs = visTimes.EndTime;
+startTimeJSTs.TimeZone = 'Asia/Tokyo';
+endTimeJSTs.TimeZone = 'Asia/Tokyo';
+
 startSec = round(seconds(visTimes.StartTime - startTimeJST));
 endSec   = round(seconds(visTimes.EndTime - startTimeJST));
 durationSec = endSec - startSec;
@@ -61,8 +78,8 @@ data1 = [ ...
     cellstr(visTimes.Source), ...
     cellstr(visTimes.Target), ...
     num2cell(visTimes.IntervalNumber), ...
-    cellstr(string(visTimes.StartTime)), ...
-    cellstr(string(visTimes.EndTime)), ...
+    cellstr(string(startTimeJSTs)), ...
+    cellstr(string(endTimeJSTs)), ...
     num2cell(startSec), ...
     num2cell(endSec), ...
     num2cell(durationSec), ...
@@ -83,17 +100,17 @@ writecell(output, fullfile(outdir, 'Result_Orbit.xlsx'));
 disp("出力完了：output/Result_Orbit.xlsx");
 
 %% ========== 関数: generateTLEfromElements ==========
-function tleText = generateTLEfromElements(sma, ecc, inc, RAAN, argPeriapsis, trueAnomaly)
+function tleText = generateTLEfromElements(sma, ecc, inc, RAAN, argPeriapsis, trueAnomaly, startTimeJST)
     mu = 398600.4418e9;  % 地球の重力定数 [m^3/s^2]
     T = 2*pi*sqrt(sma^3 / mu);      
     meanMotion = 86400 / T;       
     meanAnomaly = trueAnomaly;     
 
-    % UTCでエポック生成
-    nowUTC = datetime('now','TimeZone','UTC');
-    epochYear = mod(year(nowUTC), 100);
-    epochDay = day(nowUTC, 'dayofyear') + ...
-               hour(nowUTC)/24 + minute(nowUTC)/1440 + second(nowUTC)/86400;
+    % JSTでエポック生成
+    nowJST = startTimeJST;
+    epochYear = mod(year(nowJST), 100);
+    epochDay = day(nowJST, 'dayofyear') + ...
+               hour(nowJST)/24 + minute(nowJST)/1440 + second(nowJST)/86400;
 
     % TLEフォーマットに整形
     line1 = sprintf('1 99999U 24001A   %02d%012.8f  .00000000  00000-0  00000-0 0  0001', ...
