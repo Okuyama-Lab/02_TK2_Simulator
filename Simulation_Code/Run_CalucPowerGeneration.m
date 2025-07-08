@@ -21,12 +21,3 @@ prompt = "What is the DT value? ";
 DT = input(prompt);
 
 Caluc_PowerGeneration(data,DT)
-Caluc_PowerConsumption_ADCS(data)
-
-response = input("Result_Orbit.xlsx の準備ができたら 1 を入力: ");
-
-if response == 1
-   Analyze_Battery_SOC(DT);
-else
-   disp("キャンセルされました。バッテリー解析は実行されませんでした。");
-end

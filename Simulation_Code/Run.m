@@ -3,9 +3,11 @@
 % Name : Keigo Mutsuo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-warning('off')
 clear
 close all
+
+addpath('function');  % 補助関数フォルダを追加
+addpath('Orbit_Culculator');
 
 %% === EOS出力ファイルの選択　===
 [file_name, file_path] = uigetfile('*.csv', 'Select a CSV file');
