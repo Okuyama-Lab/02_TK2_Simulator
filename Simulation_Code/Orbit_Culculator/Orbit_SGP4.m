@@ -30,7 +30,7 @@ argPeriapsis = 0;            % 近地点引数 [deg]
 trueAnomaly = 0;             % 真近点角 [deg]
 
 % ==== JSTのシナリオ開始時刻 ====
-startTimeJST = datetime(2025,6,25,0,0,0,'TimeZone','Asia/Tokyo');
+startTimeJST = datetime(2026,1,1,0,0,0,'TimeZone','Asia/Tokyo');
 stopTime = startTimeJST + days(2);
 sampleTime = 1;  % [s]
 
@@ -53,7 +53,7 @@ gs = groundStation(sc, ...
     'Longitude', 140.05691485473042, ...
     'Altitude', 0, ...
     'Name', 'Nihon University', ...
-    'MinElevationAngle', 0);
+    'MinElevationAngle', 15);
 
 % ==== アクセス解析 ====
 ac = access(gs, sat);

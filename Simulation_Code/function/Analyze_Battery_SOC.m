@@ -74,7 +74,7 @@ function Analyze_Battery_SOC(DT)
             P_consumption = mode_map(1); %ノミナル消費電力
         end
         P_ADCS = adcs_power(i);
-        total_power = P_consumption + P_ADCS;
+        total_power = P_consumption + P_ADCS + 0.2052;
         Total_power_log(i) = total_power;
 
         cons_Wh = total_power * DT / 3600;
@@ -109,13 +109,13 @@ function Analyze_Battery_SOC(DT)
     xregion([eclips_start], [eclips_end])
     hold on;
     yline(Max_capacity_mAh, '--k', sprintf('Max: %.0fmAh', Max_capacity_mAh));
-    yline(Max_capacity_mAh * 0.85, '-.r', 'DOD: 85%');
+    yline(Max_capacity_mAh * 0.7, '-.r', 'DOD: 70%');
     ylim([0 10000]); 
     xlabel('Time [s]');
     ylabel('Battery Capacity [mAh]');
     title('Battery State of Charge (SOC)');
     setGraghStyle_B();
-    legend(["SOC [mAh]", "Max Capacity"], "Position", [0.7593 0.9331 0.1456, 0.0639])
+    legend(["SOC [mAh]", "Max Capacity"], "FontSize", 15, "Position", [0.7288 0.9336 0.1760, 0.0588])
     hConstantline = findobj(gcf,"Type","constantline");
     hConstantline(2).LineWidth = 1.5000;
     hConstantline(2).FontSize = 15;
