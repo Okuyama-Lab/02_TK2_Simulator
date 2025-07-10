@@ -1,8 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Analyze_Battery_SOC - Battery SOC, power consumption, and generation visualization & logging
+% STKから出力された太陽ベクトルを用いて、発電量を計算し、MATLAB（SGP4)を用いて計算した地上局可視解析結果から
+% 地上局通信を模擬し、それによる電力収支解析を実施するプログラムです。
 % 引数 : DT - タイムステップ [秒]
-% Last update ：2024/01/29
-% Name : Keigo Mutsuo
+% Last update ：2025/07/09
+% Developper Name : Keigo Mutsuo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function Analyze_Battery_SOC(DT)
@@ -80,7 +81,6 @@ function Analyze_Battery_SOC(DT)
     for i = 2:length(time)
        % --- 現在のSOC（Wh）
        SOC_current = battery(i-1);
-
        % --- 状態取得（元の状態）
        state = mission_state_array(i);
 
@@ -101,9 +101,9 @@ function Analyze_Battery_SOC(DT)
           state = 3;
           mission_state_array(i) = 3;
           emergency_active = true;
-          emergency_counter = emergency_counter + 1;  % ← カウント増加
+          emergency_counter = emergency_counter + 1;
        elseif emergency_counter >= 1
-          % エマージェンシーを1度でも経験後は、常に state=1 扱いだが軽ノミナル
+          % エマージェンシーを1度でも経験後は、常にノミナルに設定する
           state = 1;
           mission_state_array(i) = 1;
        end
@@ -116,14 +116,7 @@ function Analyze_Battery_SOC(DT)
        end
 
        % === 合計消費電力 ===
-       if state == 3 || (state == 1 && emergency_counter >= 1 && ~emergency_active)
-          % → 通常モード（state==1）だけど、一度でもエマージェンシー経験済なら常にノミナル
-          total_power = P_consumption;
-       else
-          % 通常のノミナルモード
-          total_power = P_consumption;
-       end
-
+       total_power = P_consumption;
        Total_power_log(i) = total_power;
 
        % === バッテリー更新 ===
@@ -133,6 +126,7 @@ function Analyze_Battery_SOC(DT)
        battery(i) = battery(i-1) + gen_Wh - cons_Wh;
        battery(i) = min(max(battery(i), 0), Max_capacity_Wh);
        Capacity(i) = battery(i) / voltage * 1000;
+       disp(['現在の解析時間：' num2str(time(i)) ' 秒']);
     end
 
     %% === 日照・日陰区間判定 ===
@@ -141,12 +135,6 @@ function Analyze_Battery_SOC(DT)
     Vec_z = data_power{:,4};
 
     Magnitude = double(~(Vec_x == 0 & Vec_y == 0 & Vec_z == 0));
-    sunlit_time = time(Magnitude ~= 0);
-    diff_data = diff(sunlit_time);
-    break_idx = find(diff_data ~= DT);
-    sunlit_start = [sunlit_time(1); sunlit_time(break_idx+1)];
-    sunlit_end   = [sunlit_time(break_idx); sunlit_time(end)];
-
     eclips_time = time(Magnitude == 0);
     diff_data_e = diff(eclips_time);
     break_idx_e = find(diff_data_e ~= DT);
@@ -197,5 +185,5 @@ function Analyze_Battery_SOC(DT)
     %% === 総消費電力ログ保存 ===
     T_power = table(time, Total_power_log, 'VariableNames', {'Time_s', 'Total_Power_W'});
     writetable(T_power, fullfile(outdir, 'TotalPowerConsumption_Log.xlsx'));
-    disp('出力ファイルを output フォルダに保存しました。');
+    disp('出力結果を output フォルダに保存しました。');
 end
