@@ -23,8 +23,8 @@ DT = input(prompt);
 
 % run("Orbit_SGP4_TLE.m");
 run("Orbit_SGP4.m");
-Caluc_PowerGeneration(data,DT);
-Caluc_PowerConsumption_ADCS(data);
+Calc_PowerGeneration(data,DT);
+Calc_PowerConsumption_ADCS(data);
 
 response = input("Result_Orbit.xlsx の準備ができたら 1 を入力: ");
 
